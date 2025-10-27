@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Form Validation Example</title>
+  <style>
+    .error { color: red; font-size: 0.9em; }
+    input:invalid { border-color: red; }
+    input:valid { border-color: green; }
+  </style>
+</head>
+<body>
+  <form id="myForm" novalidate>
+    <label>
+      Name:
+      <input type="text" id="name" required>
+      <span class="error" id="nameError"></span>
+    </label><br><br>
+    <label>
+      Email:
+      <input type="email" id="email" required>
+      <span class="error" id="emailError"></span>
+    </label><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const form = document.getElementById('myForm');
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+
+    nameInput.addEventListener('input', function() {
+      if (nameInput.value.trim() === '') {
+        nameError.textContent = 'Name is required';
+      } else {
+        nameError.textContent = '';
+      }
+    });
+
+    emailInput.addEventListener('input', function() {
+      if (!emailInput.validity.valid) {
+        emailError.textContent = 'Please enter a valid email';
+      } else {
+        emailError.textContent = '';
+      }
+    });
+
+    form.addEventListener('submit', function(event) {
+      let valid = true;
+      if (nameInput.value.trim() === '') {
+        nameError.textContent = 'Name is required';
+        valid = false;
+      }
+      if (!emailInput.validity.valid) {
+        emailError.textContent = 'Please enter a valid email';
+        valid = false;
+      }
+      if (!valid) {
+        event.preventDefault(); // Prevent form submission if invalid
+      }
+    });
+  </script>
+</body>
+</html>
