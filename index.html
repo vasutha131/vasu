@@ -1,65 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Interactive Form Validation Example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Form Validation</title>
   <style>
-    .error { color: red; font-size: 0.9em; }
-    input:invalid { border-color: red; }
-    input:valid { border-color: green; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    form {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-control {
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    small {
+      color: red;
+      position: absolute;
+      bottom: -18px;
+      left: 0;
+      visibility: hidden;
+      font-size: 12px;
+    }
+
+    .form-control.success input {
+      border-color: #28a745;
+    }
+
+    .form-control.error input {
+      border-color: #dc3545;
+    }
+
+    .form-control.error small {
+      visibility: visible;
+    }
+
+    button {
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 <body>
-  <form id="myForm" novalidate>
-    <label>
-      Name:
-      <input type="text" id="name" required>
-      <span class="error" id="nameError"></span>
-    </label><br><br>
-    <label>
-      Email:
-      <input type="email" id="email" required>
-      <span class="error" id="emailError"></span>
-    </label><br><br>
+
+  <form id="form" novalidate>
+    <h2>Register</h2>
+
+    <div class="form-control">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter username" required />
+      <small>Error message</small>
+    </div>
+
+    <div class="form-control">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter email" required />
+      <small>Error message</small>
+    </div>
+
+    <div class="form-control">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" required />
+      <small>Error message</small>
+    </div>
+
+    <div class="form-control">
+      <label for="password2">Confirm Password</label>
+      <input type="password" id="password2" placeholder="Confirm password" required />
+      <small>Error message</small>
+    </div>
+
     <button type="submit">Submit</button>
   </form>
 
   <script>
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const form = document.getElementById('myForm');
-    const nameError = document.getElementById('nameError');
-    const emailError = document.getElementById('emailError');
+    const form = document.getElementById('form');
+    const username = document.getElementById('username');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const password2 = document.getElementById('password2');
 
-    nameInput.addEventListener('input', function() {
-      if (nameInput.value.trim() === '') {
-        nameError.textContent = 'Name is required';
+    // Helper functions
+    function showError(input, message) {
+      const formControl = input.parentElement;
+      formControl.className = 'form-control error';
+      const small = formControl.querySelector('small');
+      small.innerText = message;
+    }
+
+    function showSuccess(input) {
+      const formControl = input.parentElement;
+      formControl.className = 'form-control success';
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function checkRequired(inputs) {
+      inputs.forEach((input) => {
+        if (input.value.trim() === '') {
+          showError(input, `${getFieldName(input)} is required`);
+        } else {
+          showSuccess(input);
+        }
+      });
+    }
+
+    function checkEmail(input) {
+      if (!isValidEmail(input.value.trim())) {
+        showError(input, 'Email is not valid');
       } else {
-        nameError.textContent = '';
+        showSuccess(input);
       }
+    }
+
+    function checkPasswordsMatch(pass1, pass2) {
+      if (pass1.value !== pass2.value) {
+        showError(pass2, 'Passwords do not match');
+      }
+    }
+
+    function checkLength(input, min, max) {
+      if (input.value.length < min) {
+        showError(input, `${getFieldName(input)} must be at least ${min} characters`);
+      } else if (input.value.length > max) {
+        showError(input, `${getFieldName(input)} must be less than ${max} characters`);
+      } else {
+        showSuccess(input);
+      }
+    }
+
+    function getFieldName(input) {
+      return input.id.charAt(0).toUpperCase() + input.id.slice(1);
+    }
+
+    // Event listeners
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      checkRequired([username, email, password, password2]);
+      checkLength(username, 3, 15);
+      checkLength(password, 6, 25);
+      checkEmail(email);
+      checkPasswordsMatch(password, password2);
     });
 
-    emailInput.addEventListener('input', function() {
-      if (!emailInput.validity.valid) {
-        emailError.textContent = 'Please enter a valid email';
-      } else {
-        emailError.textContent = '';
-      }
-    });
-
-    form.addEventListener('submit', function(event) {
-      let valid = true;
-      if (nameInput.value.trim() === '') {
-        nameError.textContent = 'Name is required';
-        valid = false;
-      }
-      if (!emailInput.validity.valid) {
-        emailError.textContent = 'Please enter a valid email';
-        valid = false;
-      }
-      if (!valid) {
-        event.preventDefault(); // Prevent form submission if invalid
-      }
+    // Real-time validation
+    form.addEventListener('input', () => {
+      checkRequired([username, email, password, password2]);
+      checkEmail(email);
+      checkPasswordsMatch(password, password2);
     });
   </script>
 </body>
