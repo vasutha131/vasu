@@ -127,7 +127,7 @@
     const password = document.getElementById('password');
     const password2 = document.getElementById('password2');
 
-    // Helper functions
+    
     function showError(input, message) {
       const formControl = input.parentElement;
       formControl.className = 'form-control error';
@@ -182,7 +182,7 @@
       return input.id.charAt(0).toUpperCase() + input.id.slice(1);
     }
 
-    // Event listeners
+  
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -193,7 +193,7 @@
       checkPasswordsMatch(password, password2);
     });
 
-    // Real-time validation
+    
     form.addEventListener('input', () => {
       checkRequired([username, email, password, password2]);
       checkEmail(email);
